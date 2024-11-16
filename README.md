@@ -129,35 +129,41 @@ export default {
 }
 ```
 
-### 节流函数如何传递参数？
+### 防抖节流函数如何传递参数？
 
 ```vue
-function throttle(callback, delay = 500){
-    let canInvoke = true
-    return function(...args){
-        if(canInvoke){
-            setTimeout(() => {
-                callback.apply(this, args)
-                canInvoke = true
-            }, delay)
-            canInvoke = false
+function debounce(callback, delay = 500){
+	let flag = null
+    return function(...params){
+        if(flag){
+            clearTimeout(flag)
         }
+        flag = setTimeout(() => {
+            callback.apply(this, params)
+        }, delay)
     }
 }
-const myThrottle = throttle(function(index){
-    // 节流业务逻辑
-    this.currentIndex = index
-}, 50)
+function throttle(callback, delay = 500){
+	let canInvoke = true
+    return function(...params){
+        if(canInvoke){
+            setTimeout(() => {
+                callback.apply(this, params)
+                canInvoke = true
+            }, delay)
+        }
+        canInvoke = false
+    }
+}
 export default {
-	data(){
-		return {
-			currentIndex: -1
-		}
-	},
 	methods: {
-		enterMenu(index){
-			myThrottle.call(this, index)
-		}
+		addOrMinusGoodNum: debounce(async function(skuId, skuNum){
+			await this.$store.dispatch('detail/addOrUpdateShopCar', {skuId, skuNum})
+        	this.getData()
+		}, 500),
+		enter: throttle(function(index){
+			this.currentIndex = index
+        }, 20)
 	}
 }
 ```
@@ -172,3 +178,20 @@ export default {
 
 > 备注：4.x版本的vee-validate仅支持vue3，对于vue2项目，请安装3.x版本
 
+## 项目亮点
+
+### 重写`vue-router`的`push`和`replace`方法
+
+### 轮播图、分页器等自定义组件的封装
+
+### `axios`的二次封装
+
+### 防抖节流
+
+### 放大镜效果
+
+### 路由守卫
+
+### 图片懒加载和路由懒加载
+
+### 登录注册的表单校验
